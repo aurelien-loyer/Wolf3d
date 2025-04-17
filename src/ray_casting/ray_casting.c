@@ -35,26 +35,25 @@ int world[24][24] = {
 
 static void init_player(player_t *player)
 {
-    player->pos[0] = 1.0;
-    player->pos[1] = 1.0;
+    player->pos[0] = 2.0;
+    player->pos[1] = 2.0;
     player->dir[0] = 1.0;
-    player->dir[1] = -1.0;
+    player->dir[1] = 0.0;
     player->pov[0] = 0.0;
     player->pov[1] = 0.66;
     player->speed = 0.05;
-    player->rotation = 0.015;
+    player->rotation = 0.03;
 }
 
 void wall_handling(ray_t *ray, int height, player_t *player)
 {
     if (ray->side_dir == 0)
-        ray->wall_dist = (ray->map[0] - player->pos[0]
-            + (1 - ray->step[0]) / 2) / ray->dir[0];
+        ray->wall_dist = fabs((ray->map[0] - player->pos[0] + (1 - ray->step[0]) / 2) / ray->dir[0]);
     else
-        ray->wall_dist = (ray->map[1] - player->pos[1]
-            + (1 - ray->step[1]) / 2) / ray->dir[1];
-    if (ray->wall_dist != 0)
-        ray->line_y = (int)(height / ray->wall_dist);
+        ray->wall_dist = fabs((ray->map[1] - player->pos[1] + (1 - ray->step[1]) / 2) / ray->dir[1]);
+    if (ray->wall_dist < 0.01)
+        ray->wall_dist = 0.01;
+    ray->line_y = (int)(height / ray->wall_dist);
     ray->draw[0] = -ray->line_y / 2 + height / 2;
     if (ray->draw[0] < 0)
         ray->draw[0] = 0;
@@ -71,16 +70,15 @@ void ray_handling(ray_t *ray, player_t *player, unsigned int x,
     ray->dir[1] = player->dir[1] + player->pov[1] * ray->pov;
     ray->map[0] = (int)player->pos[0];
     ray->map[1] = (int)player->pos[1];
-    ray->dist[0] = (ray->dir[0] == 0) ? 1e30 : fabs(1 / ray->dir[0]);
-    ray->dist[1] = (ray->dir[1] == 0) ? 1e30 : fabs(1 / ray->dir[1]);
+    ray->dist[0] = fabs(ray->dir[0]) < 1e-6 ? 1e30 : fabs(1 / ray->dir[0]);
+    ray->dist[1] = fabs(ray->dir[1]) < 1e-6 ? 1e30 : fabs(1 / ray->dir[1]);
     for (int i = 0; i < 2; i++) {
         if (ray->dir[i] < 0) {
             ray->step[i] = -1;
             ray->side_dist[i] = (player->pos[i] - ray->map[i]) * ray->dist[i];
         } else {
             ray->step[i] = 1;
-            ray->side_dist[i] = (ray->map[i] + 1.0
-                - player->pos[i]) * ray->dist[i];
+            ray->side_dist[i] = (ray->map[i] + 1.0 - player->pos[i]) * ray->dist[i];
         }
     }
 }

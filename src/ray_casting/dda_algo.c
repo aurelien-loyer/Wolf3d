@@ -19,6 +19,10 @@ void do_dda(ray_t *ray)
             ray->map[1] += ray->step[1];
             ray->side_dir = 1;
         }
+        if (ray->map[0] < 0 || ray->map[0] >= 24 || ray->map[1] < 0 || ray->map[1] >= 24) {
+            ray->hit_wall = 1;
+            break;
+        }
         if (world[ray->map[0]][ray->map[1]] > 0)
             ray->hit_wall = 1;
     }
