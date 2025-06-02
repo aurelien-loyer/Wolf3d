@@ -86,7 +86,7 @@ Make sure the binary is compiled, then launch the game with a map file as argume
 
 ## 👨‍💻 Authors
 
-* Aurélien Loyer
+* [Aurélien Loyer](https://github.com/aurelien-loyer)
 * Arthur Girardin-Calbe
 * Théo Futol
 
